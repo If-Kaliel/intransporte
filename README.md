@@ -14,6 +14,12 @@ O INTransporte faz parte de um projeto acadêmico sobre pontos de ônibus inteli
 
 Os dados exibidos nesta versão são estáticos. A integração com a API Java será feita quando ela estiver disponível.
 
+## Próximos passos
+
+- Conectar o aplicativo à API Java.
+- Trocar a prévia ilustrativa por um mapa real.
+- Validar as informações de acessibilidade dos pontos.
+
 ## Tecnologias
 
 - Flutter
