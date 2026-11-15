@@ -100,6 +100,23 @@ class _PontoAcessivel extends StatelessWidget {
         leading: const Icon(Icons.accessible, color: Cores.verde),
         title: Text(nome),
         subtitle: Text(detalhe),
+        onTap: () {
+          showDialog<void>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(nome),
+              content: Text(
+                '$detalhe\n\nEste ponto está marcado como acessível na demonstração.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Fechar'),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
