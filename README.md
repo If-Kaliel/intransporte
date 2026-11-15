@@ -1,29 +1,48 @@
 # INTransporte
 
-Aplicativo mobile em Flutter para acompanhar ônibus em trajeto e localizar pontos com acessibilidade.
+Aplicativo mobile acadêmico feito em Flutter para o projeto de ponto de ônibus inteligente.
 
-## Objetivo
+## Integrantes
 
-O INTransporte faz parte de um projeto acadêmico sobre pontos de ônibus inteligentes. A proposta é ajudar as pessoas a planejar seus deslocamentos e encontrar pontos acessíveis.
+| Nome | RM |
+|---|---|
+| Kaliel Aquino | RM567587 |
+| Andre Matuda | RM566733 |
+| Paulo Diedrich | RM567618 |
+| Guilherme Barca | RM568517 |
+| Guilherme Feitosa | RM566842 |
 
-## Escopo inicial
+## Projeto
 
-- Tela inicial com acesso ao mapa.
-- Prévia ilustrativa de um trajeto de ônibus.
-- Lista de pontos acessíveis e previsão de chegada de exemplo.
+A proposta do INTransporte é tornar o uso do transporte público mais acessível. O ponto inteligente poderá oferecer avisos sonoros, seleção de ônibus por totem e um botão de emergência. O aplicativo complementa o projeto mostrando ônibus em trajeto e pontos com acessibilidade.
 
-Os dados exibidos nesta versão são estáticos. A integração com a API Java será feita quando ela estiver disponível.
+## Descrição da solução
 
-## Próximos passos
+O app apresenta uma tela inicial e uma prévia do mapa com ônibus e pontos acessíveis. Nesta versão, os dados são exemplos estáticos. A conexão com a API Java será feita quando ela estiver disponível.
 
-- Conectar o aplicativo à API Java.
-- Trocar a prévia ilustrativa por um mapa real.
-- Validar as informações de acessibilidade dos pontos.
+## Funcionalidades
 
-## Tecnologias
+- Abrir o mapa a partir da tela inicial.
+- Visualizar uma prévia ilustrativa de um trajeto.
+- Consultar pontos acessíveis e previsões de chegada de exemplo.
+- Aumentar o tamanho do texto para facilitar a leitura.
 
-- Flutter
-- Dart
+## Telas
+
+| Tela | O que tem |
+|---|---|
+| Inicial | Apresentação do app, opção de aumentar as letras e acesso ao mapa |
+| Mapa | Prévia ilustrativa do trajeto e lista de pontos acessíveis |
+
+## Fluxo de navegação
+
+```text
+Inicial ──> Mapa
+```
+
+## Escopo atual
+
+O mapa e as informações exibidas são demonstrativos. Ainda não há localização em tempo real, mapa conectado nem integração com a API.
 
 ## Como executar
 
@@ -34,8 +53,25 @@ flutter pub get
 flutter run
 ```
 
-## Estrutura
+## Tecnologias utilizadas
 
-- `lib/main.dart`: inicialização do aplicativo.
-- `lib/telas/`: telas inicial e do mapa.
-- `lib/tema.dart`: cores e estilos básicos.
+- Flutter
+- Dart
+- Material Design
+
+## Estrutura do projeto
+
+```text
+lib/
+├── main.dart
+├── tema.dart
+└── telas/
+    ├── tela_inicial.dart
+    └── tela_mapa.dart
+```
+
+## Próximos passos
+
+- Conectar o aplicativo à API Java.
+- Trocar a prévia ilustrativa por um mapa real.
+- Validar as informações de acessibilidade dos pontos.
