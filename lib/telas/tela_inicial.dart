@@ -4,7 +4,14 @@ import 'tela_mapa.dart';
 import '../tema.dart';
 
 class TelaInicial extends StatelessWidget {
-  const TelaInicial({super.key});
+  final bool letrasMaiores;
+  final ValueChanged<bool> aoMudarLetras;
+
+  const TelaInicial({
+    super.key,
+    required this.letrasMaiores,
+    required this.aoMudarLetras,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +44,15 @@ class TelaInicial extends StatelessWidget {
                     subtitle: const Text(
                       'Consulte pontos acessíveis perto de você.',
                     ),
+                  ),
+                ),
+                Card(
+                  child: SwitchListTile(
+                    secondary: const Icon(Icons.text_increase),
+                    title: const Text('Letras maiores'),
+                    subtitle: const Text('Aumenta o texto do aplicativo'),
+                    value: letrasMaiores,
+                    onChanged: aoMudarLetras,
                   ),
                 ),
                 const SizedBox(height: 20),
