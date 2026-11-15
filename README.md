@@ -25,6 +25,7 @@ O app apresenta uma tela inicial e uma prévia do mapa com ônibus e pontos aces
 - Abrir o mapa a partir da tela inicial.
 - Visualizar uma prévia ilustrativa de um trajeto.
 - Consultar pontos acessíveis e previsões de chegada de exemplo.
+- Tocar em um ponto para ver seus detalhes.
 - Aumentar o tamanho do texto para facilitar a leitura.
 
 ## Telas
@@ -32,12 +33,12 @@ O app apresenta uma tela inicial e uma prévia do mapa com ônibus e pontos aces
 | Tela | O que tem |
 |---|---|
 | Inicial | Apresentação do app, opção de aumentar as letras e acesso ao mapa |
-| Mapa | Prévia ilustrativa do trajeto e lista de pontos acessíveis |
+| Mapa | Prévia ilustrativa do trajeto, lista de pontos acessíveis e detalhes ao tocar em um ponto |
 
 ## Fluxo de navegação
 
 ```text
-Inicial ──> Mapa
+Inicial ──> Mapa ──> Detalhes do ponto
 ```
 
 ## Escopo atual
