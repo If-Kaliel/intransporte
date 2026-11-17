@@ -43,7 +43,11 @@ Inicial ──> Mapa ──> Detalhes do ponto
 
 ## Escopo atual
 
-O mapa e as informações exibidas são demonstrativos. Ainda não há localização em tempo real, mapa conectado nem integração com a API.
+O mapa e as informações exibidas são demonstrativos. Ainda não há localização em tempo real nem conexão da interface com a API.
+
+## Preparação para a API Java
+
+O serviço em `lib/servicos/api_servico.dart` prepara as chamadas de login, consulta de pontos e linhas por ponto. A lista de pontos é lida de `_embedded.pontos`, e os metadados de paginação são mantidos em `page`. A URL base será informada quando o endereço do servidor estiver disponível.
 
 ## Como executar
 
