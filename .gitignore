@@ -8,3 +8,4 @@ build/
 .idea/
 .vscode/
 *.iml
+.android_scaffold_backup/
