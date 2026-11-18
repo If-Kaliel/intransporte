@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import '../config/api_configuracao.dart';
+
 class ResultadoPontos {
   const ResultadoPontos({required this.pontos, required this.pagina});
 
@@ -9,8 +11,9 @@ class ResultadoPontos {
 }
 
 class ApiServico {
-  ApiServico({required this.urlBase, HttpClient? cliente})
-    : _cliente = cliente ?? HttpClient();
+  ApiServico({Uri? urlBase, HttpClient? cliente})
+    : urlBase = urlBase ?? Uri.parse(ApiConfiguracao.urlBase),
+      _cliente = cliente ?? HttpClient();
 
   final Uri urlBase;
   final HttpClient _cliente;
