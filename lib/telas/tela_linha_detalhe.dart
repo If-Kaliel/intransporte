@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 
 import '../modelos/linha_onibus.dart';
+import '../tema.dart';
 
 class TelaLinhaDetalhe extends StatelessWidget {
   final LinhaOnibus linha;
+  final ValueChanged<bool> aoMudarTema;
 
-  const TelaLinhaDetalhe({super.key, required this.linha});
+  const TelaLinhaDetalhe({
+    super.key,
+    required this.linha,
+    required this.aoMudarTema,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalhes da linha')),
+      appBar: AppBar(
+        title: const Text('Detalhes da linha'),
+        actions: [AcaoAlternarTema(aoMudarTema: aoMudarTema)],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Card(

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../tema.dart';
+
 class TelaSobre extends StatelessWidget {
-  const TelaSobre({super.key});
+  final ValueChanged<bool> aoMudarTema;
+
+  const TelaSobre({super.key, required this.aoMudarTema});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sobre o INTransporte')),
+      appBar: AppBar(
+        title: const Text('Sobre o INTransporte'),
+        actions: [AcaoAlternarTema(aoMudarTema: aoMudarTema)],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: const [

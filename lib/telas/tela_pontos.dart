@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import '../modelos/ponto_onibus.dart';
 import '../repositorios/formulario_login_repository.dart';
 import '../servicos/api_servico.dart';
+import '../tema.dart';
 import 'tela_ponto_detalhe.dart';
 
 class TelaPontos extends StatefulWidget {
-  const TelaPontos({super.key});
+  final ValueChanged<bool> aoMudarTema;
+
+  const TelaPontos({super.key, required this.aoMudarTema});
 
   @override
   State<TelaPontos> createState() => _TelaPontosState();
@@ -88,7 +91,11 @@ class _TelaPontosState extends State<TelaPontos> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => TelaPontoDetalhe(ponto: ponto, api: _api),
+        builder: (_) => TelaPontoDetalhe(
+          ponto: ponto,
+          api: _api,
+          aoMudarTema: widget.aoMudarTema,
+        ),
       ),
     );
   }
@@ -97,7 +104,10 @@ class _TelaPontosState extends State<TelaPontos> {
   Widget build(BuildContext context) {
     final totalPaginas = (_pagina?['totalPages'] as num?)?.toInt() ?? 1;
     return Scaffold(
-      appBar: AppBar(title: const Text('Pontos de ônibus')),
+      appBar: AppBar(
+        title: const Text('Pontos de ônibus'),
+        actions: [AcaoAlternarTema(aoMudarTema: widget.aoMudarTema)],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

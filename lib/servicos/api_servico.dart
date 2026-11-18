@@ -57,13 +57,19 @@ class ApiServico {
       throw const FormatException('A resposta de pontos não é um objeto HAL.');
     }
 
-    final embedded = resposta['_embedded'];
-    if (embedded is! Map<String, dynamic> || embedded['pontos'] is! List) {
-      throw const FormatException(
-          'A resposta HAL não contém _embedded.pontos.');
+    final listaPontos = _extrairListaPontos(resposta);
+    if (listaPontos == null) {
+      final embedded = resposta['_embedded'];
+      final nomesDisponiveis = embedded is Map<String, dynamic>
+          ? embedded.keys.join(', ')
+          : resposta.keys.join(', ');
+      throw FormatException(
+        'Não foi possível localizar a lista de pontos na resposta da API. '
+        'Campos recebidos: $nomesDisponiveis.',
+      );
     }
 
-    final pontos = (embedded['pontos'] as List).map((ponto) {
+    final pontos = listaPontos.map((ponto) {
       if (ponto is! Map<String, dynamic>) {
         throw const FormatException('Um ponto da resposta não é um objeto.');
       }
@@ -79,6 +85,27 @@ class ApiServico {
       pontos: pontos,
       pagina: metadadosPagina as Map<String, dynamic>?,
     );
+  }
+
+  List<dynamic>? _extrairListaPontos(Map<String, dynamic> resposta) {
+    final embedded = resposta['_embedded'];
+    if (embedded is Map<String, dynamic>) {
+      final pontos = embedded['pontos'];
+      if (pontos is List) return pontos;
+
+      // O nome da relação HAL pode variar conforme a configuração do servidor.
+      for (final valor in embedded.values) {
+        if (valor is List) return valor;
+      }
+    }
+
+    // Também aceita respostas paginadas sem HAL.
+    final conteudo = resposta['content'];
+    if (conteudo is List) return conteudo;
+
+    // Uma página HAL vazia pode conter apenas os metadados de paginação.
+    if (resposta.containsKey('page')) return const [];
+    return null;
   }
 
   Future<List<LinhaOnibus>> listarLinhasDoPonto(int id) async {

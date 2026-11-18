@@ -8,6 +8,22 @@ class Cores {
   static const textoSuave = Color(0xFF5E7073);
 }
 
+class AcaoAlternarTema extends StatelessWidget {
+  final ValueChanged<bool> aoMudarTema;
+
+  const AcaoAlternarTema({super.key, required this.aoMudarTema});
+
+  @override
+  Widget build(BuildContext context) {
+    final escuro = Theme.of(context).brightness == Brightness.dark;
+    return IconButton(
+      tooltip: escuro ? 'Ativar tema claro' : 'Ativar tema escuro',
+      onPressed: () => aoMudarTema(!escuro),
+      icon: Icon(escuro ? Icons.light_mode : Icons.dark_mode),
+    );
+  }
+}
+
 ThemeData criarTema({bool escuro = false}) {
   final esquema = ColorScheme.fromSeed(
     seedColor: Cores.verde,

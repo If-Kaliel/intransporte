@@ -3,13 +3,20 @@ import 'package:flutter/material.dart';
 import '../modelos/linha_onibus.dart';
 import '../modelos/ponto_onibus.dart';
 import '../servicos/api_servico.dart';
+import '../tema.dart';
 import 'tela_linha_detalhe.dart';
 
 class TelaPontoDetalhe extends StatefulWidget {
   final PontoOnibus ponto;
   final ApiServico api;
+  final ValueChanged<bool> aoMudarTema;
 
-  const TelaPontoDetalhe({super.key, required this.ponto, required this.api});
+  const TelaPontoDetalhe({
+    super.key,
+    required this.ponto,
+    required this.api,
+    required this.aoMudarTema,
+  });
 
   @override
   State<TelaPontoDetalhe> createState() => _TelaPontoDetalheState();
@@ -23,7 +30,10 @@ class _TelaPontoDetalheState extends State<TelaPontoDetalhe> {
   Widget build(BuildContext context) {
     final ponto = widget.ponto;
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalhes do ponto')),
+      appBar: AppBar(
+        title: const Text('Detalhes do ponto'),
+        actions: [AcaoAlternarTema(aoMudarTema: widget.aoMudarTema)],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -69,7 +79,10 @@ class _TelaPontoDetalheState extends State<TelaPontoDetalhe> {
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => TelaLinhaDetalhe(linha: linha),
+                                builder: (_) => TelaLinhaDetalhe(
+                                  linha: linha,
+                                  aoMudarTema: widget.aoMudarTema,
+                                ),
                               ),
                             ),
                           ),

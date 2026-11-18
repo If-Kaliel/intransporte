@@ -5,12 +5,10 @@ import 'tela_pontos.dart';
 import 'tela_sobre.dart';
 
 class TelaMapa extends StatelessWidget {
-  final bool temaEscuro;
   final ValueChanged<bool> aoMudarTema;
 
   const TelaMapa({
     super.key,
-    required this.temaEscuro,
     required this.aoMudarTema,
   });
 
@@ -20,16 +18,14 @@ class TelaMapa extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mapa de ônibus'),
         actions: [
-          IconButton(
-            tooltip: temaEscuro ? 'Ativar tema claro' : 'Ativar tema escuro',
-            onPressed: () => aoMudarTema(!temaEscuro),
-            icon: Icon(temaEscuro ? Icons.light_mode : Icons.dark_mode),
-          ),
+          AcaoAlternarTema(aoMudarTema: aoMudarTema),
           IconButton(
             tooltip: 'Sobre o projeto',
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const TelaSobre()),
+              MaterialPageRoute(
+                builder: (_) => TelaSobre(aoMudarTema: aoMudarTema),
+              ),
             ),
             icon: const Icon(Icons.info_outline),
           ),
@@ -61,7 +57,9 @@ class TelaMapa extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const TelaPontos()),
+              MaterialPageRoute(
+                builder: (_) => TelaPontos(aoMudarTema: aoMudarTema),
+              ),
             ),
             icon: const Icon(Icons.location_on_outlined),
             label: const Text('Consultar pontos da API'),
@@ -82,13 +80,12 @@ class _MapaCidadeDemo extends StatefulWidget {
 class _MapaCidadeDemoState extends State<_MapaCidadeDemo>
     with SingleTickerProviderStateMixin {
   static const _rota = [
-    Offset(90, 548),
-    Offset(220, 520),
-    Offset(340, 422),
-    Offset(470, 405),
-    Offset(590, 330),
-    Offset(720, 310),
-    Offset(812, 210),
+    Offset(70, 450),
+    Offset(278, 450),
+    Offset(278, 220),
+    Offset(572, 220),
+    Offset(572, 450),
+    Offset(830, 450),
   ];
 
   late final TransformationController _controlador = TransformationController(
@@ -108,7 +105,7 @@ class _MapaCidadeDemoState extends State<_MapaCidadeDemo>
 
   Offset _posicaoOnibus(double progresso) {
     final escala = progresso * (_rota.length - 1);
-    final trecho = escala.floor().clamp(0, _rota.length - 2);
+    final trecho = escala.floor().clamp(0, _rota.length - 2).toInt();
     return Offset.lerp(_rota[trecho], _rota[trecho + 1], escala - trecho)!;
   }
 
@@ -492,8 +489,8 @@ class _CidadeDemoPainter extends CustomPainter {
       canvas.drawRRect(forma, tintaContorno);
     }
 
-    _texto(canvas, 'Av. Cruzeiro do Sul', const Offset(318, 227), textoRua);
-    _texto(canvas, 'Av. Zaki Narchi', const Offset(581, 435), textoRua);
+    _texto(canvas, 'Av. Cruzeiro do Sul', const Offset(282, 312), textoRua);
+    _texto(canvas, 'Av. Zaki Narchi', const Offset(576, 300), textoRua);
 
     final caminho = Path()
       ..moveTo(_MapaCidadeDemoState._rota.first.dx,

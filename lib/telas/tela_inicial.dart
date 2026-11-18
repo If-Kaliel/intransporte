@@ -81,7 +81,6 @@ class TelaInicial extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (_) => TelaMapa(
-                          temaEscuro: temaEscuro,
                           aoMudarTema: aoMudarTema,
                         ),
                       ),
