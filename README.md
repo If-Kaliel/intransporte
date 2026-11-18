@@ -18,7 +18,18 @@ A proposta do INTransporte é tornar o uso do transporte público mais acessíve
 
 ## Descrição da solução
 
-O app apresenta uma tela inicial e uma prévia do mapa com ônibus e pontos acessíveis. Nesta versão, os dados são exemplos estáticos. A conexão com a API Java será feita quando ela estiver disponível.
+O INTransporte é um aplicativo Flutter que reúne uma prévia interativa de mapa e uma consulta de pontos e linhas de ônibus pela API Java do grupo. O mapa usa uma cidade fictícia como demonstração; os pontos e as linhas da consulta vêm da API.
+
+## Público beneficiado
+
+A solução é pensada para cidadãos que usam o transporte público, com atenção especial a pessoas cegas ou com baixa visão e a pessoas com mobilidade reduzida. O projeto completo prevê recursos de acessibilidade no ponto inteligente, como avisos sonoros e seleção de ônibus. No aplicativo atual, os dados de acessibilidade ainda não são fornecidos pela API, e o mapa é ilustrativo.
+
+## Objetivos de Desenvolvimento Sustentável
+
+- **ODS 11 — Cidades e Comunidades Sustentáveis:** apoiar o acesso a um transporte público mais inclusivo.
+- **ODS 10 — Redução das Desigualdades:** considerar as necessidades de pessoas com deficiência no acesso ao transporte.
+
+Essas relações descrevem os objetivos do projeto acadêmico; não representam uma avaliação de impacto já realizada.
 
 ## Funcionalidades
 
@@ -34,17 +45,26 @@ O app apresenta uma tela inicial e uma prévia do mapa com ônibus e pontos aces
 | Tela | O que tem |
 |---|---|
 | Inicial | Apresentação do app, opção de aumentar as letras e acesso ao mapa |
-| Mapa | Prévia ilustrativa, busca paginada de pontos da API e consulta das linhas de cada ponto |
+| Mapa | Prévia ilustrativa da cidade, com marcadores interativos e acesso à consulta da API |
+| Pontos de ônibus | Login, filtro por endereço e paginação dos pontos retornados pela API |
+| Detalhes do ponto | Endereço do ponto e lista de linhas vinculadas |
+| Detalhes da linha | Descrição e intervalo da linha |
+| Sobre o INTransporte | Resumo do projeto e dos limites dos dados da demonstração |
 
 ## Fluxo de navegação
 
 ```text
-Inicial ──> Mapa ──> Login da API ──> Ponto ──> Linhas
+Inicial ──> Mapa ──> Pontos ──> Detalhes do ponto ──> Detalhes da linha
+             └──> Sobre
 ```
 
 ## Escopo atual
 
 O mapa do trajeto ainda é ilustrativo, pois a API não retorna coordenadas. A lista de pontos e as linhas vinculadas vêm da API depois do login. A API também ainda não fornece informações de acessibilidade dos pontos.
+
+## Uso de inteligência artificial generativa
+
+OpenAI Codex foi usado como apoio para estruturar e implementar partes do aplicativo Flutter, preparar a integração com a API, revisar mensagens e atualizar esta documentação. O grupo continua responsável por revisar, testar e apresentar o projeto.
 
 ## Preparação para a API Java
 
@@ -73,13 +93,20 @@ flutter run
 lib/
 ├── main.dart
 ├── tema.dart
+├── config/
+├── modelos/
+├── servicos/
 └── telas/
     ├── tela_inicial.dart
-    └── tela_mapa.dart
+    ├── tela_mapa.dart
+    ├── tela_pontos.dart
+    ├── tela_ponto_detalhe.dart
+    ├── tela_linha_detalhe.dart
+    └── tela_sobre.dart
 ```
 
 ## Próximos passos
 
-- Conectar o aplicativo à API Java.
 - Trocar a prévia ilustrativa por um mapa real.
-- Validar as informações de acessibilidade dos pontos.
+- Incluir coordenadas e informações de acessibilidade na API e apresentar esses dados no aplicativo.
+- Gravar, com narração de integrantes do grupo, um vídeo de até cinco minutos mostrando as telas, a navegação, a validação do formulário e o recurso de estado; publicar o vídeo como não listado no YouTube.
