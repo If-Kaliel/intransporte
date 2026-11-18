@@ -47,7 +47,9 @@ O mapa e as informações exibidas são demonstrativos. Ainda não há localiza�
 
 ## Preparação para a API Java
 
-O serviço em `lib/servicos/api_servico.dart` prepara as chamadas de login, consulta de pontos e linhas por ponto. A lista de pontos é lida de `_embedded.pontos`, e os metadados de paginação são mantidos em `page`. A URL base será informada quando o endereço do servidor estiver disponível.
+O serviço em `lib/servicos/api_servico.dart` prepara as chamadas de login, consulta de pontos e linhas por ponto. A lista de pontos é lida de `_embedded.pontos`, e os metadados de paginação são mantidos em `page`.
+
+No emulador Android, a URL padrão é `http://10.0.2.2:8080`, que aponta para o computador onde a API está rodando. Para outro endereço, execute com `--dart-define=API_URL=http://endereco-do-servidor:8080`. O tráfego HTTP sem TLS fica liberado apenas no manifesto de debug.
 
 ## Como executar
 
