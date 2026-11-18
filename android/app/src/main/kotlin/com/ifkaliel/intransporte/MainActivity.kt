@@ -1,5 +1,8 @@
 package com.ifkaliel.intransporte
 
+import android.media.AudioManager
+import android.os.Build
+import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -38,10 +41,21 @@ class MainActivity : FlutterActivity() {
                             )
                         } else {
                             voz.setSpeechRate(0.95f)
+                            val parametrosAudio = Bundle().apply {
+                                putInt(
+                                    TextToSpeech.Engine.KEY_PARAM_STREAM,
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        AudioManager.STREAM_ACCESSIBILITY
+                                    } else {
+                                        AudioManager.STREAM_MUSIC
+                                    },
+                                )
+                                putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f)
+                            }
                             val estado = voz.speak(
                                 texto,
                                 TextToSpeech.QUEUE_FLUSH,
-                                null,
+                                parametrosAudio,
                                 "intransporte-ponto",
                             )
                             if (estado == TextToSpeech.ERROR) {
