@@ -64,7 +64,7 @@ O mapa do trajeto ainda é ilustrativo, pois a API não retorna coordenadas. A l
 
 ## Uso de inteligência artificial generativa
 
-OpenAI Codex foi usado como apoio para estruturar e implementar partes do aplicativo Flutter, preparar a integração com a API, revisar mensagens e atualizar esta documentação. O grupo continua responsável por revisar, testar e apresentar o projeto.
+Foi feito uso mínimo para geração de funções que fogem do conhecimento do grupo ou do que foi visto em aula em benefício do aplicativo em si para que fique melhor para o usuário final.
 
 ## Preparação para a API Java
 
