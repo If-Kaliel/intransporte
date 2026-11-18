@@ -37,11 +37,11 @@ class TelaInicial extends StatelessWidget {
                   style: TextStyle(color: Cores.textoSuave, fontSize: 16),
                 ),
                 const SizedBox(height: 32),
-                Card(
+                const Card(
                   child: ListTile(
-                    leading: const Icon(Icons.accessible, color: Cores.verde),
-                    title: const Text('Mobilidade para todos'),
-                    subtitle: const Text(
+                    leading: Icon(Icons.accessible, color: Cores.verde),
+                    title: Text('Mobilidade para todos'),
+                    subtitle: Text(
                       'Consulte pontos acessíveis perto de você.',
                     ),
                   ),
