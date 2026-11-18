@@ -14,6 +14,7 @@ class TelaPontos extends StatefulWidget {
 }
 
 class _TelaPontosState extends State<TelaPontos> {
+  final _formKey = GlobalKey<FormState>();
   final _api = ApiServico();
   final _loginController = TextEditingController();
   final _senhaController = TextEditingController();
@@ -35,10 +36,7 @@ class _TelaPontosState extends State<TelaPontos> {
   }
 
   Future<void> _carregarPontos({int pagina = 0}) async {
-    if (!_conectado &&
-        (_loginController.text.trim().isEmpty ||
-            _senhaController.text.isEmpty)) {
-      setState(() => _erro = 'Informe login e senha para consultar a API.');
+    if (!_conectado && !_formKey.currentState!.validate()) {
       return;
     }
     setState(() {
@@ -102,16 +100,31 @@ class _TelaPontosState extends State<TelaPontos> {
               style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           if (!_conectado) ...[
-            TextField(
-              controller: _loginController,
-              decoration: const InputDecoration(labelText: 'Login'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _senhaController,
-              decoration: const InputDecoration(labelText: 'Senha'),
-              obscureText: true,
-              onSubmitted: (_) => _carregarPontos(),
+            Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _loginController,
+                    decoration: const InputDecoration(labelText: 'Login'),
+                    textCapitalization: TextCapitalization.none,
+                    validator: (valor) => valor == null || valor.trim().isEmpty
+                        ? 'Informe o login.'
+                        : null,
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _senhaController,
+                    decoration: const InputDecoration(labelText: 'Senha'),
+                    obscureText: true,
+                    onFieldSubmitted: (_) => _carregarPontos(),
+                    validator: (valor) => valor == null || valor.isEmpty
+                        ? 'Informe a senha.'
+                        : null,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
