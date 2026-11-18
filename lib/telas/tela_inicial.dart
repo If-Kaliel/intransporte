@@ -6,11 +6,15 @@ import '../tema.dart';
 class TelaInicial extends StatelessWidget {
   final bool letrasMaiores;
   final ValueChanged<bool> aoMudarLetras;
+  final bool temaEscuro;
+  final ValueChanged<bool> aoMudarTema;
 
   const TelaInicial({
     super.key,
     required this.letrasMaiores,
     required this.aoMudarLetras,
+    required this.temaEscuro,
+    required this.aoMudarTema,
   });
 
   @override
@@ -31,10 +35,13 @@ class TelaInicial extends StatelessWidget {
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Acompanhe os ônibus em trajeto e encontre pontos com acessibilidade.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Cores.textoSuave, fontSize: 16),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 32),
                 const Card(
@@ -55,12 +62,29 @@ class TelaInicial extends StatelessWidget {
                     onChanged: aoMudarLetras,
                   ),
                 ),
+                Card(
+                  child: SwitchListTile(
+                    secondary: Icon(
+                      temaEscuro ? Icons.dark_mode : Icons.light_mode,
+                    ),
+                    title: const Text('Tema escuro'),
+                    subtitle:
+                        const Text('Alterna entre aparência clara e escura'),
+                    value: temaEscuro,
+                    onChanged: aoMudarTema,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const TelaMapa()),
+                      MaterialPageRoute(
+                        builder: (_) => TelaMapa(
+                          temaEscuro: temaEscuro,
+                          aoMudarTema: aoMudarTema,
+                        ),
+                      ),
                     );
                   },
                   icon: const Icon(Icons.map_outlined),

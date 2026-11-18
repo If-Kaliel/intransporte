@@ -16,10 +16,17 @@ class INTransporteApp extends StatefulWidget {
 
 class _INTransporteAppState extends State<INTransporteApp> {
   bool _letrasMaiores = false;
+  bool _temaEscuro = false;
 
   void _mudarLetras(bool valor) {
     setState(() {
       _letrasMaiores = valor;
+    });
+  }
+
+  void _mudarTema(bool valor) {
+    setState(() {
+      _temaEscuro = valor;
     });
   }
 
@@ -29,6 +36,8 @@ class _INTransporteAppState extends State<INTransporteApp> {
       title: 'INTransporte',
       debugShowCheckedModeBanner: false,
       theme: criarTema(),
+      darkTheme: criarTema(escuro: true),
+      themeMode: _temaEscuro ? ThemeMode.dark : ThemeMode.light,
       builder: (context, child) {
         if (!_letrasMaiores) {
           return child!;
@@ -45,6 +54,8 @@ class _INTransporteAppState extends State<INTransporteApp> {
       home: TelaInicial(
         letrasMaiores: _letrasMaiores,
         aoMudarLetras: _mudarLetras,
+        temaEscuro: _temaEscuro,
+        aoMudarTema: _mudarTema,
       ),
     );
   }

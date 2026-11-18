@@ -5,7 +5,14 @@ import 'tela_pontos.dart';
 import 'tela_sobre.dart';
 
 class TelaMapa extends StatelessWidget {
-  const TelaMapa({super.key});
+  final bool temaEscuro;
+  final ValueChanged<bool> aoMudarTema;
+
+  const TelaMapa({
+    super.key,
+    required this.temaEscuro,
+    required this.aoMudarTema,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +20,11 @@ class TelaMapa extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mapa de ônibus'),
         actions: [
+          IconButton(
+            tooltip: temaEscuro ? 'Ativar tema claro' : 'Ativar tema escuro',
+            onPressed: () => aoMudarTema(!temaEscuro),
+            icon: Icon(temaEscuro ? Icons.light_mode : Icons.dark_mode),
+          ),
           IconButton(
             tooltip: 'Sobre o projeto',
             onPressed: () => Navigator.push(
@@ -26,17 +38,23 @@ class TelaMapa extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'Ônibus em trajeto',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            'Zona Norte de São Paulo',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Santana · Carandiru · Vila Maria · Tucuruvi',
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 12),
           const _MapaCidadeDemo(),
           const Padding(
             padding: EdgeInsets.only(top: 8),
             child: Text(
-              'Arraste para mover, use dois dedos para ampliar e toque nos marcadores. Cidade fictícia.',
-              style: TextStyle(color: Cores.textoSuave, fontSize: 13),
+              'Mapa ilustrativo baseado em bairros reais. Ônibus e posições são simulados; arraste ou amplie para explorar.',
+              style: TextStyle(fontSize: 13),
             ),
           ),
           const SizedBox(height: 20),
@@ -61,23 +79,46 @@ class _MapaCidadeDemo extends StatefulWidget {
   State<_MapaCidadeDemo> createState() => _MapaCidadeDemoState();
 }
 
-class _MapaCidadeDemoState extends State<_MapaCidadeDemo> {
+class _MapaCidadeDemoState extends State<_MapaCidadeDemo>
+    with SingleTickerProviderStateMixin {
+  static const _rota = [
+    Offset(90, 548),
+    Offset(220, 520),
+    Offset(340, 422),
+    Offset(470, 405),
+    Offset(590, 330),
+    Offset(720, 310),
+    Offset(812, 210),
+  ];
+
   late final TransformationController _controlador = TransformationController(
     Matrix4.identity()..translateByDouble(-180.0, -100.0, 0, 1),
   );
+  late final AnimationController _animacao = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 24),
+  )..repeat();
 
   @override
   void dispose() {
+    _animacao.dispose();
     _controlador.dispose();
     super.dispose();
   }
 
+  Offset _posicaoOnibus(double progresso) {
+    final escala = progresso * (_rota.length - 1);
+    final trecho = escala.floor().clamp(0, _rota.length - 2);
+    return Offset.lerp(_rota[trecho], _rota[trecho + 1], escala - trecho)!;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final escuro = Theme.of(context).brightness == Brightness.dark;
     return Column(
       children: [
         SizedBox(
-          height: 340,
+          height: 370,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: InteractiveViewer(
@@ -91,51 +132,65 @@ class _MapaCidadeDemoState extends State<_MapaCidadeDemo> {
                 height: 640,
                 child: Stack(
                   children: [
-                    const Positioned.fill(
-                      child: CustomPaint(painter: _CidadeDemoPainter()),
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: _CidadeDemoPainter(escuro: escuro),
+                      ),
                     ),
-                    _rotulo(45, 48, 'Parque das Flores'),
-                    _rotulo(345, 48, 'Centro'),
-                    _rotulo(645, 48, 'Hospital Municipal'),
-                    _rotulo(40, 290, 'Vila Nova'),
-                    _rotulo(345, 290, 'Mercado Central'),
-                    _rotulo(645, 290, 'Terminal Central'),
-                    _rotulo(345, 510, 'Jardim das Árvores'),
+                    _rotulo(context, 52, 60, 'TUCURUVI'),
+                    _rotulo(context, 342, 56, 'JARDIM SÃO PAULO'),
+                    _rotulo(context, 654, 64, 'VILA MARIA'),
+                    _rotulo(context, 54, 286, 'SANTANA'),
+                    _rotulo(context, 347, 286, 'ALTO DE SANTANA'),
+                    _rotulo(context, 652, 286, 'VILA GUILHERME'),
+                    _rotulo(context, 347, 520, 'CARANDIRU'),
                     _marcador(
                       context,
-                      215,
-                      168,
-                      'Ponto da Praça',
-                      'Ponto acessível simulado · Linha 203',
-                      Icons.accessible,
-                      Cores.verde,
-                    ),
-                    _marcador(
-                      context,
-                      405,
-                      395,
-                      'Ponto Central',
-                      'Ponto acessível simulado · Linhas 105 e 203',
-                      Icons.accessible,
-                      Cores.verde,
-                    ),
-                    _marcador(
-                      context,
-                      690,
+                      190,
                       180,
-                      'Ônibus da Linha 203',
-                      'Veículo em trajeto na cidade simulada.',
-                      Icons.directions_bus,
-                      const Color(0xFFDB7042),
+                      'Metrô Tucuruvi',
+                      'Estação fictícia no mapa de demonstração.',
+                      Icons.train,
+                      const Color(0xFF587BB8),
                     ),
                     _marcador(
                       context,
-                      755,
-                      485,
-                      'Ponto do Terminal',
-                      'Ponto acessível simulado · Linha 105',
+                      465,
+                      174,
+                      'Ponto Santana',
+                      'Parada simulada com acessibilidade · Linha 203.',
                       Icons.accessible,
                       Cores.verde,
+                    ),
+                    _marcador(
+                      context,
+                      710,
+                      402,
+                      'Ponto Vila Maria',
+                      'Parada simulada com acessibilidade · Linha 105.',
+                      Icons.accessible,
+                      Cores.verde,
+                    ),
+                    _marcador(
+                      context,
+                      245,
+                      420,
+                      'Parque da Juventude',
+                      'Área verde próxima ao Carandiru.',
+                      Icons.park,
+                      const Color(0xFF53885C),
+                    ),
+                    AnimatedBuilder(
+                      animation: _animacao,
+                      builder: (context, child) {
+                        final posicao = _posicaoOnibus(_animacao.value);
+                        return Positioned(
+                          left: posicao.dx - 23,
+                          top: posicao.dy - 23,
+                          child: child!,
+                        );
+                      },
+                      child: _marcadorOnibus(context),
                     ),
                   ],
                 ),
@@ -149,31 +204,34 @@ class _MapaCidadeDemoState extends State<_MapaCidadeDemo> {
           runSpacing: 8,
           children: [
             _LegendaMapa(icone: Icons.accessible, texto: 'Ponto acessível'),
-            _LegendaMapa(
-                icone: Icons.directions_bus, texto: 'Ônibus em trajeto'),
+            _LegendaMapa(icone: Icons.directions_bus, texto: 'Ônibus simulado'),
+            _LegendaMapa(icone: Icons.train, texto: 'Metrô'),
           ],
         ),
       ],
     );
   }
 
-  Widget _rotulo(double left, double top, String texto) {
+  Widget _rotulo(BuildContext context, double left, double top, String texto) {
+    final cores = Theme.of(context).colorScheme;
     return Positioned(
       left: left,
       top: top,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.9),
+          color: cores.surface.withValues(alpha: 0.92),
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: cores.outlineVariant),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
           child: Text(
             texto,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Cores.textoSuave,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.3,
+              color: cores.onSurfaceVariant,
             ),
           ),
         ),
@@ -193,69 +251,113 @@ class _MapaCidadeDemoState extends State<_MapaCidadeDemo> {
     return Positioned(
       left: left,
       top: top,
-      child: Tooltip(
-        message: titulo,
-        child: GestureDetector(
-          onTap: () => showModalBottomSheet<void>(
-            context: context,
-            showDragHandle: true,
-            builder: (context) => SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(titulo, style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 8),
-                    Text(detalhe),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Localização e informações fictícias para demonstração.',
-                      style: TextStyle(color: Cores.textoSuave),
-                    ),
-                  ],
+      child: _iconeMapa(context, titulo, detalhe, icone, cor),
+    );
+  }
+
+  Widget _iconeMapa(
+    BuildContext context,
+    String titulo,
+    String detalhe,
+    IconData icone,
+    Color cor,
+  ) {
+    final cores = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: titulo,
+      child: GestureDetector(
+        onTap: () => _mostrarDetalhe(context, titulo, detalhe),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: cor,
+                shape: BoxShape.circle,
+                border: Border.all(color: cores.surface, width: 3),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Icon(icone, color: Colors.white, size: 22),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+              decoration: BoxDecoration(
+                color: cores.surface,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x22000000), blurRadius: 4),
+                ],
+              ),
+              child: Text(
+                titulo,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: cores.onSurface,
                 ),
               ),
             ),
-          ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _marcadorOnibus(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _mostrarDetalhe(
+        context,
+        'Ônibus da Linha 203',
+        'Veículo animado em um trajeto simulado pela Zona Norte.',
+      ),
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          color: const Color(0xFFDB7042),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 3),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x44000000),
+              blurRadius: 9,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: const Icon(Icons.directions_bus, color: Colors.white),
+      ),
+    );
+  }
+
+  void _mostrarDetalhe(BuildContext context, String titulo, String detalhe) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: cor,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Icon(icone, color: Colors.white),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x22000000), blurRadius: 4),
-                  ],
-                ),
-                child: Text(
-                  titulo,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Cores.texto,
-                  ),
+              Text(titulo, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 8),
+              Text(detalhe),
+              const SizedBox(height: 8),
+              Text(
+                'Posição e informações são simuladas para a demonstração.',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -267,115 +369,186 @@ class _MapaCidadeDemoState extends State<_MapaCidadeDemo> {
 }
 
 class _CidadeDemoPainter extends CustomPainter {
-  const _CidadeDemoPainter();
+  final bool escuro;
+
+  const _CidadeDemoPainter({required this.escuro});
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawColor(const Color(0xFFEAF0E8), BlendMode.srcOver);
+    final fundo = escuro ? const Color(0xFF192523) : const Color(0xFFE9EFE8);
+    final quadra = escuro ? const Color(0xFF293431) : const Color(0xFFE2DED3);
+    final predio = escuro ? const Color(0xFF3B4843) : const Color(0xFFF8F5EF);
+    final contorno = escuro ? const Color(0xFF56645E) : const Color(0xFFD1D8D0);
+    final rua = escuro ? const Color(0xFF46504C) : const Color(0xFFFDFCF8);
+    final textoRua = escuro ? const Color(0xFFB2BDB7) : const Color(0xFF7B8980);
+    canvas.drawColor(fundo, BlendMode.srcOver);
 
-    const blocos = [
-      Rect.fromLTWH(28, 28, 215, 158),
-      Rect.fromLTWH(305, 30, 112, 72),
-      Rect.fromLTWH(430, 30, 116, 72),
-      Rect.fromLTWH(305, 116, 112, 72),
-      Rect.fromLTWH(430, 116, 116, 72),
-      Rect.fromLTWH(596, 30, 245, 158),
-      Rect.fromLTWH(28, 254, 215, 169),
-      Rect.fromLTWH(305, 254, 241, 169),
-      Rect.fromLTWH(596, 254, 245, 169),
-      Rect.fromLTWH(28, 484, 215, 128),
-      Rect.fromLTWH(305, 484, 241, 128),
-      Rect.fromLTWH(596, 484, 245, 128),
-    ];
-    const coresBlocos = [
-      Color(0xFFCBE7C3),
-      Color(0xFFF3D9C3),
-      Color(0xFFE7DBCE),
-      Color(0xFFE4D8C9),
-      Color(0xFFF2E1C5),
-      Color(0xFFE1E6E8),
-      Color(0xFFE2D8CB),
-      Color(0xFFF0E5D5),
-      Color(0xFFD8E8E2),
-      Color(0xFFE8DCCF),
-      Color(0xFFCBE7C3),
-      Color(0xFFE3DACC),
-    ];
-
-    for (var i = 0; i < blocos.length; i++) {
-      final forma = RRect.fromRectAndRadius(
-        blocos[i],
-        const Radius.circular(18),
-      );
-      canvas.drawRRect(forma, Paint()..color = coresBlocos[i]);
-    }
-
-    const edificios = [
-      Rect.fromLTWH(318, 42, 44, 42),
-      Rect.fromLTWH(372, 42, 34, 42),
-      Rect.fromLTWH(438, 42, 92, 34),
-      Rect.fromLTWH(318, 112, 44, 42),
-      Rect.fromLTWH(372, 112, 46, 42),
-      Rect.fromLTWH(438, 105, 92, 48),
-      Rect.fromLTWH(615, 50, 72, 46),
-      Rect.fromLTWH(705, 50, 115, 46),
-      Rect.fromLTWH(615, 112, 92, 48),
-      Rect.fromLTWH(725, 112, 94, 48),
-      Rect.fromLTWH(42, 275, 72, 52),
-      Rect.fromLTWH(130, 275, 85, 52),
-      Rect.fromLTWH(40, 344, 92, 52),
-      Rect.fromLTWH(145, 344, 70, 52),
-      Rect.fromLTWH(615, 275, 82, 48),
-      Rect.fromLTWH(710, 275, 110, 48),
-      Rect.fromLTWH(615, 345, 100, 52),
-      Rect.fromLTWH(728, 345, 92, 52),
-      Rect.fromLTWH(42, 505, 82, 40),
-      Rect.fromLTWH(140, 505, 74, 40),
-      Rect.fromLTWH(615, 505, 105, 42),
-      Rect.fromLTWH(735, 505, 84, 42),
-    ];
-    final corEdificio = Paint()..color = const Color(0xFFF8F5EF);
-    final linhaEdificio = Paint()
-      ..color = const Color(0xFFD4DCD6)
+    final tintaQuadra = Paint()..color = quadra;
+    final tintaPredio = Paint()..color = predio;
+    final tintaContorno = Paint()
+      ..color = contorno
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
-    for (final edificio in edificios) {
-      final forma = RRect.fromRectAndRadius(
-        edificio,
-        const Radius.circular(7),
+
+    const quadras = [
+      Rect.fromLTWH(28, 28, 218, 156),
+      Rect.fromLTWH(306, 30, 112, 72),
+      Rect.fromLTWH(432, 30, 116, 72),
+      Rect.fromLTWH(306, 116, 112, 72),
+      Rect.fromLTWH(432, 116, 116, 72),
+      Rect.fromLTWH(600, 30, 244, 154),
+      Rect.fromLTWH(28, 254, 218, 168),
+      Rect.fromLTWH(306, 254, 242, 168),
+      Rect.fromLTWH(600, 254, 244, 168),
+      Rect.fromLTWH(28, 484, 218, 126),
+      Rect.fromLTWH(306, 484, 242, 126),
+      Rect.fromLTWH(600, 484, 244, 126),
+    ];
+    for (final quadra in quadras) {
+      final forma = RRect.fromRectAndRadius(quadra, const Radius.circular(16));
+      canvas.drawRRect(forma, tintaQuadra);
+    }
+
+    // Parque da Juventude, ao lado da antiga área do Carandiru.
+    final parque = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(42, 274, 78, 132),
+      const Radius.circular(12),
+    );
+    canvas.drawRRect(
+      parque,
+      Paint()
+        ..color = escuro ? const Color(0xFF31543E) : const Color(0xFFBBD6B3),
+    );
+    for (final arvore in [
+      const Offset(61, 300),
+      const Offset(96, 319),
+      const Offset(69, 362),
+      const Offset(101, 384),
+    ]) {
+      canvas.drawCircle(
+        arvore,
+        8,
+        Paint()
+          ..color = escuro ? const Color(0xFF6F9C6C) : const Color(0xFF83AD79),
       );
-      canvas.drawRRect(forma, corEdificio);
-      canvas.drawRRect(forma, linhaEdificio);
     }
 
     final ruas = Paint()
-      ..color = const Color(0xFFFFFEFA)
+      ..color = rua
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
-      ..strokeWidth = 34;
+      ..strokeWidth = 38;
     for (final y in [220.0, 450.0]) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), ruas);
     }
-    for (final x in [280.0, 570.0]) {
+    for (final x in [278.0, 572.0]) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), ruas);
     }
+    final faixa = Paint()
+      ..color = escuro ? const Color(0xFF707A74) : const Color(0xFFD6D5CE)
+      ..strokeWidth = 2;
+    for (var x = 12.0; x < size.width; x += 42) {
+      canvas.drawLine(Offset(x, 220), Offset(x + 20, 220), faixa);
+      canvas.drawLine(Offset(x, 450), Offset(x + 20, 450), faixa);
+    }
+    for (var y = 12.0; y < size.height; y += 42) {
+      canvas.drawLine(Offset(278, y), Offset(278, y + 20), faixa);
+      canvas.drawLine(Offset(572, y), Offset(572, y + 20), faixa);
+    }
 
-    final trajeto = Path()
-      ..moveTo(0, 585)
-      ..cubicTo(220, 555, 370, 340, 565, 315)
-      ..cubicTo(690, 300, 760, 130, 900, 95);
+    const edificios = [
+      Rect.fromLTWH(320, 42, 40, 43),
+      Rect.fromLTWH(370, 42, 36, 43),
+      Rect.fromLTWH(442, 42, 42, 42),
+      Rect.fromLTWH(492, 42, 44, 42),
+      Rect.fromLTWH(320, 114, 40, 44),
+      Rect.fromLTWH(370, 114, 36, 44),
+      Rect.fromLTWH(442, 112, 42, 48),
+      Rect.fromLTWH(492, 112, 44, 48),
+      Rect.fromLTWH(620, 46, 68, 48),
+      Rect.fromLTWH(704, 46, 122, 48),
+      Rect.fromLTWH(620, 112, 92, 48),
+      Rect.fromLTWH(730, 112, 96, 48),
+      Rect.fromLTWH(134, 274, 92, 54),
+      Rect.fromLTWH(134, 344, 92, 54),
+      Rect.fromLTWH(320, 274, 86, 54),
+      Rect.fromLTWH(420, 274, 108, 54),
+      Rect.fromLTWH(320, 344, 88, 54),
+      Rect.fromLTWH(422, 344, 106, 54),
+      Rect.fromLTWH(620, 274, 90, 52),
+      Rect.fromLTWH(724, 274, 102, 52),
+      Rect.fromLTWH(620, 344, 90, 54),
+      Rect.fromLTWH(724, 344, 102, 54),
+      Rect.fromLTWH(44, 504, 82, 40),
+      Rect.fromLTWH(142, 504, 84, 40),
+      Rect.fromLTWH(320, 504, 92, 42),
+      Rect.fromLTWH(426, 504, 102, 42),
+      Rect.fromLTWH(620, 504, 92, 42),
+      Rect.fromLTWH(728, 504, 98, 42),
+    ];
+    for (final edificio in edificios) {
+      final forma = RRect.fromRectAndRadius(edificio, const Radius.circular(6));
+      canvas.drawRRect(forma, tintaPredio);
+      canvas.drawRRect(forma, tintaContorno);
+    }
+
+    _texto(canvas, 'Av. Cruzeiro do Sul', const Offset(318, 227), textoRua);
+    _texto(canvas, 'Av. Zaki Narchi', const Offset(581, 435), textoRua);
+
+    final caminho = Path()
+      ..moveTo(_MapaCidadeDemoState._rota.first.dx,
+          _MapaCidadeDemoState._rota.first.dy);
+    for (final ponto in _MapaCidadeDemoState._rota.skip(1)) {
+      caminho.lineTo(ponto.dx, ponto.dy);
+    }
     canvas.drawPath(
-      trajeto,
+      caminho,
       Paint()
-        ..color = const Color(0xFF168B79)
+        ..color = const Color(0xFF138B78)
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
-        ..strokeWidth = 7,
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = 8,
     );
+    for (final parada in [
+      _MapaCidadeDemoState._rota[1],
+      _MapaCidadeDemoState._rota[3],
+      _MapaCidadeDemoState._rota[5],
+    ]) {
+      canvas.drawCircle(parada, 6, Paint()..color = const Color(0xFFFFFEFA));
+      canvas.drawCircle(
+        parada,
+        4,
+        Paint()
+          ..color = const Color(0xFF138B78)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
+    }
+  }
+
+  void _texto(Canvas canvas, String texto, Offset posicao, Color cor) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: texto,
+        style: TextStyle(
+          color: cor,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    canvas.save();
+    canvas.translate(posicao.dx, posicao.dy);
+    canvas.rotate(-1.5708);
+    painter.paint(canvas, Offset.zero);
+    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _CidadeDemoPainter oldDelegate) =>
+      oldDelegate.escuro != escuro;
 }
 
 class _LegendaMapa extends StatelessWidget {
@@ -386,12 +559,16 @@ class _LegendaMapa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cores = Theme.of(context).colorScheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icone, size: 17, color: Cores.verde),
+        Icon(icone, size: 17, color: cores.primary),
         const SizedBox(width: 5),
-        Text(texto, style: const TextStyle(fontSize: 12)),
+        Text(
+          texto,
+          style: TextStyle(fontSize: 12, color: cores.onSurfaceVariant),
+        ),
       ],
     );
   }
