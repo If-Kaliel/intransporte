@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../modelos/ponto_onibus.dart';
+import '../repositorios/formulario_login_repository.dart';
 import '../servicos/api_servico.dart';
 import 'tela_ponto_detalhe.dart';
 
@@ -15,9 +16,12 @@ class TelaPontos extends StatefulWidget {
 
 class _TelaPontosState extends State<TelaPontos> {
   final _formKey = GlobalKey<FormState>();
+  final _formularioLogin = FormularioLoginRepository.instancia;
   final _api = ApiServico();
-  final _loginController = TextEditingController();
-  final _senhaController = TextEditingController();
+  late final _loginController =
+      TextEditingController(text: _formularioLogin.login);
+  late final _senhaController =
+      TextEditingController(text: _formularioLogin.senha);
   final _enderecoController = TextEditingController();
   List<PontoOnibus> _pontos = [];
   Map<String, dynamic>? _pagina;
@@ -60,6 +64,7 @@ class _TelaPontosState extends State<TelaPontos> {
         _pontos = resultado.pontos;
         _pagina = resultado.pagina;
         _paginaAtual = pagina;
+        _formularioLogin.limpar();
         _senhaController.clear();
         _loginController.clear();
       });
@@ -109,6 +114,7 @@ class _TelaPontosState extends State<TelaPontos> {
                     controller: _loginController,
                     decoration: const InputDecoration(labelText: 'Login'),
                     textCapitalization: TextCapitalization.none,
+                    onChanged: _formularioLogin.salvarLogin,
                     validator: (valor) => valor == null || valor.trim().isEmpty
                         ? 'Informe o login.'
                         : null,
@@ -118,6 +124,7 @@ class _TelaPontosState extends State<TelaPontos> {
                     controller: _senhaController,
                     decoration: const InputDecoration(labelText: 'Senha'),
                     obscureText: true,
+                    onChanged: _formularioLogin.salvarSenha,
                     onFieldSubmitted: (_) => _carregarPontos(),
                     validator: (valor) => valor == null || valor.isEmpty
                         ? 'Informe a senha.'
