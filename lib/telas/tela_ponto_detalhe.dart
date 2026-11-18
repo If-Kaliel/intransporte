@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../modelos/linha_onibus.dart';
 import '../modelos/ponto_onibus.dart';
 import '../servicos/api_servico.dart';
+import '../servicos/servico_narracao.dart';
 import '../tema.dart';
 import 'tela_linha_detalhe.dart';
 
@@ -10,12 +11,14 @@ class TelaPontoDetalhe extends StatefulWidget {
   final PontoOnibus ponto;
   final ApiServico api;
   final ValueChanged<bool> aoMudarTema;
+  final bool narracaoAtiva;
 
   const TelaPontoDetalhe({
     super.key,
     required this.ponto,
     required this.api,
     required this.aoMudarTema,
+    required this.narracaoAtiva,
   });
 
   @override
@@ -23,8 +26,34 @@ class TelaPontoDetalhe extends StatefulWidget {
 }
 
 class _TelaPontoDetalheState extends State<TelaPontoDetalhe> {
+  final _narrador = ServicoNarracao();
   late final Future<List<LinhaOnibus>> _linhas =
       widget.api.listarLinhasDoPonto(widget.ponto.id);
+
+  Future<void> _narrarDetalhes() async {
+    final ponto = widget.ponto;
+    var texto = 'Ponto de ônibus. ${ponto.endereco}, número ${ponto.numero}.';
+    try {
+      final linhas = await _linhas;
+      if (linhas.isNotEmpty) {
+        texto +=
+            ' Linhas que atendem este ponto: ${linhas.map((linha) => linha.nome).join(', ')}.';
+      }
+    } catch (_) {
+      // O endereço ainda pode ser narrado se a consulta de linhas falhar.
+    }
+
+    try {
+      await _narrador.falar(texto);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A narração não está disponível neste dispositivo.'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +73,14 @@ class _TelaPontoDetalheState extends State<TelaPontoDetalhe> {
               subtitle: Text('Identificador ${ponto.id}'),
             ),
           ),
+          if (widget.narracaoAtiva) ...[
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: _narrarDetalhes,
+              icon: const Icon(Icons.volume_up_outlined),
+              label: const Text('Ouvir informações do ponto'),
+            ),
+          ],
           const SizedBox(height: 16),
           Text('Linhas vinculadas',
               style: Theme.of(context).textTheme.titleLarge),
@@ -92,9 +129,12 @@ class _TelaPontoDetalheState extends State<TelaPontoDetalhe> {
             },
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Os dados de acessibilidade ainda não são enviados pela API.',
-            style: TextStyle(color: Color(0xFF5E7073), fontSize: 13),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 13,
+            ),
           ),
         ],
       ),

@@ -5,13 +5,19 @@ import 'package:flutter/material.dart';
 import '../modelos/ponto_onibus.dart';
 import '../repositorios/formulario_login_repository.dart';
 import '../servicos/api_servico.dart';
+import '../servicos/servico_narracao.dart';
 import '../tema.dart';
 import 'tela_ponto_detalhe.dart';
 
 class TelaPontos extends StatefulWidget {
   final ValueChanged<bool> aoMudarTema;
+  final bool narracaoAtiva;
 
-  const TelaPontos({super.key, required this.aoMudarTema});
+  const TelaPontos({
+    super.key,
+    required this.aoMudarTema,
+    required this.narracaoAtiva,
+  });
 
   @override
   State<TelaPontos> createState() => _TelaPontosState();
@@ -20,6 +26,7 @@ class TelaPontos extends StatefulWidget {
 class _TelaPontosState extends State<TelaPontos> {
   final _formKey = GlobalKey<FormState>();
   final _formularioLogin = FormularioLoginRepository.instancia;
+  final _narrador = ServicoNarracao();
   final _api = ApiServico();
   late final _loginController =
       TextEditingController(text: _formularioLogin.login);
@@ -95,9 +102,26 @@ class _TelaPontosState extends State<TelaPontos> {
           ponto: ponto,
           api: _api,
           aoMudarTema: widget.aoMudarTema,
+          narracaoAtiva: widget.narracaoAtiva,
         ),
       ),
     );
+  }
+
+  Future<void> _narrarPonto(PontoOnibus ponto) async {
+    try {
+      await _narrador.falar(
+        'Ponto de ônibus. ${ponto.endereco}, número ${ponto.numero}. '
+        'Identificador ${ponto.id}. Toque no ponto para consultar as linhas.',
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A narração não está disponível neste dispositivo.'),
+        ),
+      );
+    }
   }
 
   @override
@@ -185,7 +209,19 @@ class _TelaPontosState extends State<TelaPontos> {
                   title: Text('${ponto.endereco}, ${ponto.numero}'),
                   subtitle:
                       Text('Ponto ${ponto.id} · toque para ver as linhas'),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: widget.narracaoAtiva
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              tooltip: 'Narrar ponto',
+                              onPressed: () => _narrarPonto(ponto),
+                              icon: const Icon(Icons.volume_up_outlined),
+                            ),
+                            const Icon(Icons.chevron_right),
+                          ],
+                        )
+                      : const Icon(Icons.chevron_right),
                   onTap: () => _abrirPonto(ponto),
                 ),
               )),
@@ -213,9 +249,12 @@ class _TelaPontosState extends State<TelaPontos> {
               ],
             ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'A API ainda não envia informações de acessibilidade dos pontos.',
-            style: TextStyle(color: Color(0xFF5E7073), fontSize: 13),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 13,
+            ),
           ),
         ],
       ),

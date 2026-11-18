@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../tema.dart';
+import '../servicos/servico_narracao.dart';
 import 'tela_pontos.dart';
 import 'tela_sobre.dart';
 
 class TelaMapa extends StatelessWidget {
   final ValueChanged<bool> aoMudarTema;
+  final bool narracaoAtiva;
 
   const TelaMapa({
     super.key,
     required this.aoMudarTema,
+    required this.narracaoAtiva,
   });
 
   @override
@@ -24,7 +27,9 @@ class TelaMapa extends StatelessWidget {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => TelaSobre(aoMudarTema: aoMudarTema),
+                builder: (_) => TelaSobre(
+                  aoMudarTema: aoMudarTema,
+                ),
               ),
             ),
             icon: const Icon(Icons.info_outline),
@@ -45,7 +50,7 @@ class TelaMapa extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 12),
-          const _MapaCidadeDemo(),
+          _MapaCidadeDemo(narracaoAtiva: narracaoAtiva),
           const Padding(
             padding: EdgeInsets.only(top: 8),
             child: Text(
@@ -58,7 +63,10 @@ class TelaMapa extends StatelessWidget {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => TelaPontos(aoMudarTema: aoMudarTema),
+                builder: (_) => TelaPontos(
+                  aoMudarTema: aoMudarTema,
+                  narracaoAtiva: narracaoAtiva,
+                ),
               ),
             ),
             icon: const Icon(Icons.location_on_outlined),
@@ -71,7 +79,9 @@ class TelaMapa extends StatelessWidget {
 }
 
 class _MapaCidadeDemo extends StatefulWidget {
-  const _MapaCidadeDemo();
+  final bool narracaoAtiva;
+
+  const _MapaCidadeDemo({required this.narracaoAtiva});
 
   @override
   State<_MapaCidadeDemo> createState() => _MapaCidadeDemoState();
@@ -79,6 +89,7 @@ class _MapaCidadeDemo extends StatefulWidget {
 
 class _MapaCidadeDemoState extends State<_MapaCidadeDemo>
     with SingleTickerProviderStateMixin {
+  final _narrador = ServicoNarracao();
   static const _rota = [
     Offset(70, 450),
     Offset(278, 450),
@@ -263,7 +274,10 @@ class _MapaCidadeDemoState extends State<_MapaCidadeDemo>
     return Tooltip(
       message: titulo,
       child: GestureDetector(
-        onTap: () => _mostrarDetalhe(context, titulo, detalhe),
+        onTap: () {
+          if (widget.narracaoAtiva) _narrar('$titulo. $detalhe');
+          _mostrarDetalhe(context, titulo, detalhe);
+        },
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -311,11 +325,18 @@ class _MapaCidadeDemoState extends State<_MapaCidadeDemo>
 
   Widget _marcadorOnibus(BuildContext context) {
     return GestureDetector(
-      onTap: () => _mostrarDetalhe(
-        context,
-        'Ônibus da Linha 203',
-        'Veículo animado em um trajeto simulado pela Zona Norte.',
-      ),
+      onTap: () {
+        if (widget.narracaoAtiva) {
+          _narrar(
+            'Ônibus da linha 203 em trajeto simulado pela Zona Norte.',
+          );
+        }
+        _mostrarDetalhe(
+          context,
+          'Ônibus da Linha 203',
+          'Veículo animado em um trajeto simulado pela Zona Norte.',
+        );
+      },
       child: Container(
         width: 46,
         height: 46,
@@ -362,6 +383,19 @@ class _MapaCidadeDemoState extends State<_MapaCidadeDemo>
         ),
       ),
     );
+  }
+
+  Future<void> _narrar(String texto) async {
+    try {
+      await _narrador.falar(texto);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A narração não está disponível neste dispositivo.'),
+        ),
+      );
+    }
   }
 }
 

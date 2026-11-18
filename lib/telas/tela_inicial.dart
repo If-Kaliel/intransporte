@@ -8,6 +8,10 @@ class TelaInicial extends StatelessWidget {
   final ValueChanged<bool> aoMudarLetras;
   final bool temaEscuro;
   final ValueChanged<bool> aoMudarTema;
+  final bool altoContraste;
+  final ValueChanged<bool> aoMudarAltoContraste;
+  final bool narracaoAtiva;
+  final ValueChanged<bool> aoMudarNarracao;
 
   const TelaInicial({
     super.key,
@@ -15,6 +19,10 @@ class TelaInicial extends StatelessWidget {
     required this.aoMudarLetras,
     required this.temaEscuro,
     required this.aoMudarTema,
+    required this.altoContraste,
+    required this.aoMudarAltoContraste,
+    required this.narracaoAtiva,
+    required this.aoMudarNarracao,
   });
 
   @override
@@ -44,11 +52,14 @@ class TelaInicial extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                const Card(
+                Card(
                   child: ListTile(
-                    leading: Icon(Icons.accessible, color: Cores.verde),
-                    title: Text('Mobilidade para todos'),
-                    subtitle: Text(
+                    leading: Icon(
+                      Icons.accessible,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    title: const Text('Mobilidade para todos'),
+                    subtitle: const Text(
                       'Consulte pontos acessíveis perto de você.',
                     ),
                   ),
@@ -74,6 +85,26 @@ class TelaInicial extends StatelessWidget {
                     onChanged: aoMudarTema,
                   ),
                 ),
+                Card(
+                  child: SwitchListTile(
+                    secondary: const Icon(Icons.contrast),
+                    title: const Text('Alto contraste'),
+                    subtitle: const Text('Reforça o contraste de cores'),
+                    value: altoContraste,
+                    onChanged: aoMudarAltoContraste,
+                  ),
+                ),
+                Card(
+                  child: SwitchListTile(
+                    secondary: const Icon(Icons.record_voice_over_outlined),
+                    title: const Text('Narrar pontos'),
+                    subtitle: const Text(
+                      'Ativa a leitura em voz alta dos pontos selecionados',
+                    ),
+                    value: narracaoAtiva,
+                    onChanged: aoMudarNarracao,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: () {
@@ -82,6 +113,7 @@ class TelaInicial extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) => TelaMapa(
                           aoMudarTema: aoMudarTema,
+                          narracaoAtiva: narracaoAtiva,
                         ),
                       ),
                     );

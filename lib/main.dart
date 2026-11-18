@@ -17,6 +17,8 @@ class INTransporteApp extends StatefulWidget {
 class _INTransporteAppState extends State<INTransporteApp> {
   bool _letrasMaiores = false;
   bool _temaEscuro = false;
+  bool _altoContraste = false;
+  bool _narracaoAtiva = false;
 
   void _mudarLetras(bool valor) {
     setState(() {
@@ -30,13 +32,25 @@ class _INTransporteAppState extends State<INTransporteApp> {
     });
   }
 
+  void _mudarAltoContraste(bool valor) {
+    setState(() {
+      _altoContraste = valor;
+    });
+  }
+
+  void _mudarNarracao(bool valor) {
+    setState(() {
+      _narracaoAtiva = valor;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'INTransporte',
       debugShowCheckedModeBanner: false,
-      theme: criarTema(),
-      darkTheme: criarTema(escuro: true),
+      theme: criarTema(altoContraste: _altoContraste),
+      darkTheme: criarTema(escuro: true, altoContraste: _altoContraste),
       themeMode: _temaEscuro ? ThemeMode.dark : ThemeMode.light,
       builder: (context, child) {
         if (!_letrasMaiores) {
@@ -56,6 +70,10 @@ class _INTransporteAppState extends State<INTransporteApp> {
         aoMudarLetras: _mudarLetras,
         temaEscuro: _temaEscuro,
         aoMudarTema: _mudarTema,
+        altoContraste: _altoContraste,
+        aoMudarAltoContraste: _mudarAltoContraste,
+        narracaoAtiva: _narracaoAtiva,
+        aoMudarNarracao: _mudarNarracao,
       ),
     );
   }
