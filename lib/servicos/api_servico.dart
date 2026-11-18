@@ -70,14 +70,14 @@ class ApiServico {
       return PontoOnibus.fromJson(ponto);
     }).toList(growable: false);
 
-    final pagina = resposta['page'];
-    if (pagina != null && pagina is! Map<String, dynamic>) {
+    final metadadosPagina = resposta['page'];
+    if (metadadosPagina != null && metadadosPagina is! Map<String, dynamic>) {
       throw const FormatException('O campo page da resposta não é um objeto.');
     }
 
     return ResultadoPontos(
       pontos: pontos,
-      pagina: pagina as Map<String, dynamic>?,
+      pagina: metadadosPagina as Map<String, dynamic>?,
     );
   }
 

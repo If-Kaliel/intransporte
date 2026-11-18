@@ -24,8 +24,9 @@ O app apresenta uma tela inicial e uma prévia do mapa com ônibus e pontos aces
 
 - Abrir o mapa a partir da tela inicial.
 - Visualizar uma prévia ilustrativa de um trajeto.
-- Consultar pontos acessíveis e previsões de chegada de exemplo.
-- Tocar em um ponto para ver seus detalhes.
+- Entrar na API Java e carregar os pontos cadastrados.
+- Filtrar pontos pelo endereço e navegar pelas páginas retornadas pela API.
+- Tocar em um ponto para consultar as linhas vinculadas a ele.
 - Aumentar o tamanho do texto para facilitar a leitura.
 
 ## Telas
@@ -33,21 +34,21 @@ O app apresenta uma tela inicial e uma prévia do mapa com ônibus e pontos aces
 | Tela | O que tem |
 |---|---|
 | Inicial | Apresentação do app, opção de aumentar as letras e acesso ao mapa |
-| Mapa | Prévia ilustrativa do trajeto, lista de pontos acessíveis e detalhes ao tocar em um ponto |
+| Mapa | Prévia ilustrativa, busca paginada de pontos da API e consulta das linhas de cada ponto |
 
 ## Fluxo de navegação
 
 ```text
-Inicial ──> Mapa ──> Detalhes do ponto
+Inicial ──> Mapa ──> Login da API ──> Ponto ──> Linhas
 ```
 
 ## Escopo atual
 
-O mapa e as informações exibidas são demonstrativos. Ainda não há localização em tempo real nem conexão da interface com a API.
+O mapa do trajeto ainda é ilustrativo, pois a API não retorna coordenadas. A lista de pontos e as linhas vinculadas vêm da API depois do login. A API também ainda não fornece informações de acessibilidade dos pontos.
 
 ## Preparação para a API Java
 
-O serviço em `lib/servicos/api_servico.dart` prepara as chamadas de login, consulta de pontos e linhas por ponto. A lista de pontos é lida de `_embedded.pontos`, e os metadados de paginação são mantidos em `page`.
+O serviço em `lib/servicos/api_servico.dart` chama `POST /auth/login`, `GET /api/pontos` e `GET /api/pontos/{id}/linhas`. A lista HAL é lida de `_embedded.pontos`, e a busca por endereço e a paginação usam os parâmetros da API.
 
 No emulador Android, a URL padrão é `http://10.0.2.2:8080`, que aponta para o computador onde a API está rodando. Para outro endereço, execute com `--dart-define=API_URL=http://endereco-do-servidor:8080`. O tráfego HTTP sem TLS fica liberado apenas no manifesto de debug.
 
