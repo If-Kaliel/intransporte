@@ -12,6 +12,8 @@ Aplicativo mobile acadêmico feito em Flutter para o projeto de ponto de ônibus
 | Guilherme Barca | RM568517 |
 | Guilherme Feitosa | RM566842 |
 
+## Link do vídeo do YouTube: (https://youtu.be/d-DOIrmki2M)
+
 ## Projeto
 
 A proposta do INTransporte é tornar o uso do transporte público mais acessível. O ponto inteligente poderá oferecer avisos sonoros, seleção de ônibus por totem e um botão de emergência. O aplicativo complementa o projeto mostrando ônibus em trajeto e pontos com acessibilidade.
@@ -104,9 +106,3 @@ lib/
     ├── tela_linha_detalhe.dart
     └── tela_sobre.dart
 ```
-
-## Próximos passos
-
-- Trocar a prévia ilustrativa por um mapa real.
-- Incluir coordenadas e informações de acessibilidade na API e apresentar esses dados no aplicativo.
-- Gravar, com narração de integrantes do grupo, um vídeo de até cinco minutos mostrando as telas, a navegação, a validação do formulário e o recurso de estado; publicar o vídeo como não listado no YouTube.
